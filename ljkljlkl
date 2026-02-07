@@ -1,1 +1,12 @@
-OPENAI_API_KEY=sk-proj-JpOPCaDifyx_yiAbx7qfBnu1I2J1wQCmqjvfbUY5Vr0mCqR_ctTqN-iD_weczJh6fPDpMvzlnvT3BlbkFJEhEfwlxggnbxUSzxjyN9iEIYMs99MnHKVbhxy5UIMWXb7zjlhjEoFOZk1APVu-EWH1pXBB33I
+# SECURITY FIX: Removed hardcoded OpenAI API key
+# 
+# WARNING: This key may be compromised and must be rotated immediately.
+# Never commit actual secrets to version control. Add .env to .gitignore.
+# 
+# Configuration:
+# 1. Replace placeholder with your actual API key from https://platform.openai.com/api-keys
+# 2. For production, use a secrets manager instead of environment variables
+# 
+# Example: OPENAI_API_KEY=sk-proj-your_key_here
+
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE

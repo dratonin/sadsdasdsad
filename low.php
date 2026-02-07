@@ -6,18 +6,28 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {
 
 	switch ($_DVWA['SQLI_DB']) {
 		case MYSQL:
-			// Check database
-			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id';";
-			$result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '<pre>' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '</pre>' );
+			// Use prepared statement to prevent SQL injection
+			// This separates SQL logic from user data, preventing malicious input from altering the query structure
+			$stmt = mysqli_prepare($GLOBALS["___mysqli_ston"], "SELECT first_name, last_name FROM users WHERE user_id = ?");
+			if ($stmt) {
+				// Bind the user input as an integer parameter to the prepared statement
+				mysqli_stmt_bind_param($stmt, "i", $id);
+				mysqli_stmt_execute($stmt);
+				$result = mysqli_stmt_get_result($stmt);
+				
+				// Get results
+				while( $row = mysqli_fetch_assoc( $result ) ) {
+					// Get values
+					$first = $row["first_name"];
+					$last  = $row["last_name"];
 
-			// Get results
-			while( $row = mysqli_fetch_assoc( $result ) ) {
-				// Get values
-				$first = $row["first_name"];
-				$last  = $row["last_name"];
-
-				// Feedback for end user
-				$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+					// Feedback for end user
+					$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+				}
+				
+				mysqli_stmt_close($stmt);
+			} else {
+				die('<pre>Error preparing statement: ' . mysqli_error($GLOBALS["___mysqli_ston"]) . '</pre>');
 			}
 
 			mysqli_close($GLOBALS["___mysqli_ston"]);
@@ -28,26 +38,27 @@ if( isset( $_REQUEST[ 'Submit' ] ) ) {
 			#$sqlite_db_connection = new SQLite3($_DVWA['SQLITE_DB']);
 			#$sqlite_db_connection->enableExceptions(true);
 
-			$query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id';";
-			#print $query;
-			try {
-				$results = $sqlite_db_connection->query($query);
-			} catch (Exception $e) {
-				echo 'Caught exception: ' . $e->getMessage();
-				exit();
-			}
+			// Use prepared statement to prevent SQL injection
+			// This separates SQL logic from user data, preventing malicious input from altering the query structure
+			$stmt = $sqlite_db_connection->prepare("SELECT first_name, last_name FROM users WHERE user_id = :id");
+			if ($stmt) {
+				// Bind the user input as an integer parameter to the prepared statement
+				$stmt->bindValue(':id', $id, SQLITE3_INTEGER);
+				$results = $stmt->execute();
+				
+				if ($results) {
+					// Use SQLITE3_ASSOC to fetch only associative array (matching original behavior)
+					while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+						// Get values
+						$first = $row["first_name"];
+						$last  = $row["last_name"];
 
-			if ($results) {
-				while ($row = $results->fetchArray()) {
-					// Get values
-					$first = $row["first_name"];
-					$last  = $row["last_name"];
-
-					// Feedback for end user
-					$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+						// Feedback for end user
+						$html .= "<pre>ID: {$id}<br />First name: {$first}<br />Surname: {$last}</pre>";
+					}
 				}
 			} else {
-				echo "Error in fetch ".$sqlite_db->lastErrorMsg();
+				echo "Error preparing statement: " . $sqlite_db_connection->lastErrorMsg();
 			}
 			break;
 	} 

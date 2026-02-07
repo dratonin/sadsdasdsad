@@ -1,1 +1,15 @@
-OPENAI_API_KEY=sk-proj-JpOPCaDifyx_yiAbx7qfBnu1I2J1wQCmqjvfbUY5Vr0mCqR_ctTqN-iD_weczJh6fPDpMvzlnvT3BlbkFJEhEfwlxggnbxUSzxjyN9iEIYMs99MnHKVbhxy5UIMWXb7zjlhjEoFOZk1APVu-EWH1pXBB33I
+# SECURITY FIX: Removed hardcoded OpenAI API key
+# 
+# CRITICAL: If the original key was valid, ROTATE IT IMMEDIATELY at:
+# https://platform.openai.com/api-keys
+#
+# Best practices for handling API keys:
+# 1. Set as environment variable: export OPENAI_API_KEY='your_actual_key_here'
+# 2. Use a secrets manager in production (AWS Secrets Manager, HashiCorp Vault, etc.)
+# 3. Never commit secrets to git - add .env to .gitignore
+# 4. Load via process.env.OPENAI_API_KEY or os.getenv('OPENAI_API_KEY') in code
+#
+# For local development, create a .env file (DO NOT COMMIT IT):
+# OPENAI_API_KEY=sk-proj-your-secret-key-here
+
+OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
